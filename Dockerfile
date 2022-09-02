@@ -4,4 +4,5 @@ COPY . /app/
 WORKDIR /app
 RUN pip install --upgrade pip \
      && pip install -r requirements.txt
-CMD ["python", "manage.py", "runserver"]
+#CMD ["python", "manage.py", "runserver"]
+CMD ["uwsgi", "--ini", "uwsgi.ini"]
