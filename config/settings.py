@@ -40,11 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'movies.apps.MoviesConfig',
+    'django_extensions',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -53,6 +56,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+CORS_ALLOWED_ORIGINS = ["http://127.0.0.1:8080", ]
 
 TEMPLATES = [
     {
@@ -71,7 +75,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -114,6 +117,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATIC_ROOT = 'src/static'
 STATIC_URL = '/static/'
 
 # Default primary key field type
@@ -133,7 +137,36 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', 5432),
         'OPTIONS': {
             # Нужно явно указать схемы, с которыми будет работать приложение.
-           'options': '-c search_path=public,content'
+            'options': '-c search_path=public,content'
         }
     }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]',
+        },
+    },
+    'handlers': {
+        'debug-console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+            'filters': ['require_debug_true'],
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['debug-console'],
+            'propagate': False,
+        }
+    },
 }
