@@ -11,28 +11,26 @@ services:
       - ./pg_data/data:/var/lib/postgresql/data/
     networks:
       default:
-    ports:
-      # Перенаправляем запросы, поступающие к localhost:5432 на порт 5432.
-      - "5432:5432"
   django-admin-panel:
     build:
       context: .
+    volumes:
+      - ./src/static/:/app/src/static/:ro
     networks:
       default:
-    ports:
-      # Перенаправляем запросы, поступающие к localhost:8000 на порт 8000.
-      - "8000:8000"
     depends_on:
       # Сервис должен запуститься только после того, как postgres будет готов принимать запросы
       - postgres
     expose:
       - 8000
   nginx:
-    image: nginx:1.19.2
+    image: nginx:1.23.1
     volumes:
       - ./src/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./src/conf.d/:/etc/nginx/conf.d/:ro
       - ./src/static/:/opt/aa/webroot/:ro
+    networks:
+      default:
     depends_on:
       - django-admin-panel
     ports:

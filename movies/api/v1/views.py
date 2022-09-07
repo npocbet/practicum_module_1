@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.generic.detail import BaseDetailView
 from django.views.generic.list import BaseListView
 
-from movies.models import FilmWork
+from movies.models import FilmWork, PersonFilmwork
 
 
 class MoviesApiMixin:
@@ -15,11 +15,11 @@ class MoviesApiMixin:
     def get_queryset(self):
         films = FilmWork.objects.prefetch_related('genres', 'persons', ) \
             .annotate(genres=ArrayAgg('genre__name', distinct=True),
-                      actors=ArrayAgg('person__full_name', filter=Q(personfilmwork__role='actor'),
+                      actors=ArrayAgg('person__full_name', filter=Q(personfilmwork__role=PersonFilmwork.Role.a),
                                       distinct=True),
-                      directors=ArrayAgg('person__full_name', filter=Q(personfilmwork__role='director'),
+                      directors=ArrayAgg('person__full_name', filter=Q(personfilmwork__role=PersonFilmwork.Role.d),
                                          distinct=True),
-                      writers=ArrayAgg('person__full_name', filter=Q(personfilmwork__role='writer'),
+                      writers=ArrayAgg('person__full_name', filter=Q(personfilmwork__role=PersonFilmwork.Role.w),
                                        distinct=True)) \
             .values('id', 'title', 'description', 'creation_date', 'rating', 'type', 'genres',
                     'actors', 'directors', 'writers')

@@ -106,9 +106,9 @@ class PersonFilmwork(UUIDMixin):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
 
     class Role(models.TextChoices):
-        m = "d", "director"
-        t = "s", "screenwriter"
-        a = "a", "actor"
+        d = "director", "director"
+        w = "writer", "writer"
+        a = "actor", "actor"
 
     role = models.CharField(
         max_length=12,
