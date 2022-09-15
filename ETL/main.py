@@ -35,36 +35,6 @@ class ETL:
             print('transaciton added ', transaction)
             transaction += 1
 
-    def transform_one_element(self, data_dict: dict) -> dict[str, str | list[Any] | Any]:
-        """
-        Метод преобразует словарь одной записи Postgresql в словарь документа Elasticsearch
-        :param data_dict: словарь, полученный из БД
-        :return: преобразованный словарь, для записи в Elasticsearch согласно схеме индекса
-        """
-        data = dict()
-        data['id'] = data_dict['id']
-        data['imdb_rating'] = data_dict['rating']
-        data['genre'] = data_dict['genres']
-        data['title'] = ''.join(char for char in data_dict['title'] if char.isalnum() or char == ' ')
-        data['description'] = ''.join(char for char in data_dict['description'] if char.isalnum() or char == ' ') \
-            if data_dict['description'] is not None else ''
-        data['director'] = []
-        data['actors_names'] = []
-        data['writers_names'] = []
-        data['actors'] = []
-        data['writers'] = []
-        for person in data_dict['persons']:
-            if person['person_role'] == 'director':
-                data['director'].append(person['person_name'])
-            elif person['person_role'] == 'actor':
-                data['actors_names'].append(person['person_name'])
-                data['actors'].append({'id': person['person_id'], 'name': person['person_name']})
-            elif person['person_role'] == 'writer':
-                data['writers_names'].append(person['person_name'])
-                data['writers'].append({'id': person['person_id'], 'name': person['person_name']})
-
-        return data
-
     @backoff
     def extract(self, current_id_t: str) -> list[dict[Any, Any]]:
         """
@@ -109,6 +79,35 @@ class ETL:
             ans1.append(dict(row))
 
         return ans1
+
+    def transform_one_element(self, data_dict: dict) -> dict[str, str | list[Any] | Any]:
+        """
+        Метод преобразует словарь одной записи Postgresql в словарь документа Elasticsearch
+        :param data_dict: словарь, полученный из БД
+        :return: преобразованный словарь, для записи в Elasticsearch согласно схеме индекса
+        """
+        data = dict()
+        data['id'] = data_dict['id']
+        data['imdb_rating'] = data_dict['rating']
+        data['genre'] = data_dict['genres']
+        data['title'] = data_dict['title']
+        data['description'] = data_dict['description']
+        data['director'] = []
+        data['actors_names'] = []
+        data['writers_names'] = []
+        data['actors'] = []
+        data['writers'] = []
+        for person in data_dict['persons']:
+            if person['person_role'] == 'director':
+                data['director'].append(person['person_name'])
+            elif person['person_role'] == 'actor':
+                data['actors_names'].append(person['person_name'])
+                data['actors'].append({'id': person['person_id'], 'name': person['person_name']})
+            elif person['person_role'] == 'writer':
+                data['writers_names'].append(person['person_name'])
+                data['writers'].append({'id': person['person_id'], 'name': person['person_name']})
+
+        return data
 
     @backoff
     def load(self, data: list) -> None:
