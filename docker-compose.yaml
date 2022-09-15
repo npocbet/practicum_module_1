@@ -28,7 +28,8 @@ services:
     volumes:
       - ./src/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./src/conf.d/:/etc/nginx/conf.d/:ro
-      - ./src/static/:/opt/aa/webroot/:ro
+#      - ./src/static/:/opt/aa/webroot/:ro
+      - ./src/static/:/data/:ro
     networks:
       default:
     depends_on:
