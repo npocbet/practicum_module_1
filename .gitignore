@@ -1,2 +1,4 @@
 /config/.env
 .env
+etl.log
+state.json
