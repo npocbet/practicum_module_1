@@ -4,6 +4,7 @@ from typing import Any
 import elasticsearch
 import psycopg2
 import psycopg2.extras
+import logging
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
@@ -14,7 +15,6 @@ from state import State, JsonFileStorage
 
 START_ID = os.environ.get('START_ID', '00000000-0000-0000-0000-000000000000')
 LIMIT_AT = os.environ.get('LIMIT_AT', 100)
-import logging
 
 logging.basicConfig(
     filename='etl.log',
@@ -30,6 +30,8 @@ class ETL:
         записывает в Elasticsearch. Реализовано сохранение последнего обработанного индекса
         в файл.
         """
+        self.current_id = None
+        self.es = None
         self.storage = State(JsonFileStorage('state.json'))
 
     @backoff(log=logging, exception=elasticsearch.exceptions.ConnectionError)
